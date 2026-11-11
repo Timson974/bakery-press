@@ -758,9 +758,10 @@ async function handlePdfUpload(input) {
     // 2. Find the first cell that is purely numeric (the Units value)
     // 3. Match the reconstructed code against our SECTIONS product codes
 
-    // Debug: log first 30 rows to see real PDF structure
+    // Debug: log all rows and codeMap keys
     console.log('PDF rows sample:');
     allLines.slice(0, 30).forEach((cells, i) => console.log(`  row${i}:`, JSON.stringify(cells)));
+    console.log('codeMap keys:', Object.keys(buildCodeMap()).join(', '));
 
     const codeMap = buildCodeMap();
     // Also build a normalised map: strip hyphens/spaces for fuzzy matching
@@ -822,6 +823,7 @@ async function handlePdfUpload(input) {
         const qty = Math.round(parseFloat(cells[unitsIdx].replace(/[^0-9.]/g, '')));
         if (!isNaN(qty) && qty >= 0) {
           const inp = document.querySelector(`.plan-input[data-code="${prod.code}"]`);
+          console.log(`PDF match attempt: code=${prod.code} qty=${qty} inp=${inp ? 'FOUND' : 'NOT FOUND'}`);
           if (inp) {
             console.log(`PDF match: ${prod.code} = ${qty}`);
             inp.value = qty;
