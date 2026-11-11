@@ -720,18 +720,31 @@ async function handlePdfUpload(input) {
       const page = await pdf.getPage(p);
       const content = await page.getTextContent();
 
-      // Group text items by their Y position (row) → columns left-to-right
-      const rowMap = {};
+      // Group text items by their Y position with ±3px tolerance
+      // (PDF text in one visual row can have slightly different Y due to baseline shifts)
+      const rawItems = [];
       content.items.forEach(item => {
-        const y = Math.round(item.transform[5]); // vertical position
-        if (!rowMap[y]) rowMap[y] = [];
-        rowMap[y].push({ x: item.transform[4], text: item.str.trim() });
+        if (item.str.trim()) {
+          rawItems.push({ x: item.transform[4], y: item.transform[5], text: item.str.trim() });
+        }
       });
 
-      // Sort rows top-to-bottom (higher Y = higher on page in PDF coords)
-      const sortedYs = Object.keys(rowMap).map(Number).sort((a,b) => b - a);
-      sortedYs.forEach(y => {
-        const cells = rowMap[y].sort((a,b) => a.x - b.x).map(c => c.text).filter(Boolean);
+      // Sort by Y descending (top of page first), then X ascending
+      rawItems.sort((a, b) => b.y - a.y || a.x - b.x);
+
+      // Cluster into rows using 3px tolerance
+      const rows = [];
+      rawItems.forEach(item => {
+        const lastRow = rows[rows.length - 1];
+        if (lastRow && Math.abs(item.y - lastRow.y) <= 3) {
+          lastRow.items.push(item);
+        } else {
+          rows.push({ y: item.y, items: [item] });
+        }
+      });
+
+      rows.forEach(row => {
+        const cells = row.items.sort((a,b) => a.x - b.x).map(c => c.text).filter(Boolean);
         if (cells.length) allLines.push(cells);
       });
     }
@@ -744,6 +757,10 @@ async function handlePdfUpload(input) {
     // 1. For each row, concatenate all text cells stripping spaces/dashes to form candidate codes
     // 2. Find the first cell that is purely numeric (the Units value)
     // 3. Match the reconstructed code against our SECTIONS product codes
+
+    // Debug: log first 30 rows to see real PDF structure
+    console.log('PDF rows sample:');
+    allLines.slice(0, 30).forEach((cells, i) => console.log(`  row${i}:`, JSON.stringify(cells)));
 
     const codeMap = buildCodeMap();
     // Also build a normalised map: strip hyphens/spaces for fuzzy matching
@@ -796,10 +813,11 @@ async function handlePdfUpload(input) {
       }
 
       if (prod && unitsIdx !== -1 && !matched.has(prod.code)) {
-        const qty = parseInt(cells[unitsIdx]);
+        const qty = Math.round(parseFloat(cells[unitsIdx].replace(/[^0-9.]/g, '')));
         if (!isNaN(qty) && qty >= 0) {
           const inp = document.querySelector(`.plan-input[data-code="${prod.code}"]`);
           if (inp) {
+            console.log(`PDF match: ${prod.code} = ${qty}`);
             inp.value = qty;
             onPlanChange(inp);
             matched.add(prod.code);
