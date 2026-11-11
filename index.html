@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Press Calc">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232c3e50'/%3E%3Ctext y='.9em' font-size='72' x='14'%3E🍞%3C/text%3E%3C/svg%3E">
-<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Bakery%20Press%20Calculator%22%2C%22short_name%22%3A%22Press%20Calc%22%2C%22description%22%3A%22Bakery%20dough%20press%20calculator%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f5f5f0%22%2C%22theme_color%22%3A%22%232c3e50%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520100%2520100'%253E%253Crect%2520width%3D'100'%2520height%3D'100'%2520rx%3D'22'%2520fill%3D'%25232c3e50'%2F%253E%253Ctext%2520y%3D'.9em'%2520font-size%3D'72'%2520x%3D'14'%253E%25F0%259F%258D%259E%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <style>
   :root {
     --bg: #f5f5f0;
@@ -480,6 +480,13 @@ function recalcAll() {
 }
 
 // ── PWA INSTALL PROMPT ───────────────────────────────────────────────────────
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW:', err));
+  });
+}
+
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
