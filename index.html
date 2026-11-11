@@ -302,8 +302,8 @@
 <script>
 // ── CREDENTIALS ──────────────────────────────────────────────────────────────
 const USERS = {
-  baker:      { pass: "dough2024",      role: "Baker" },
-  supervisor: { pass: "bakery2024",     role: "Supervisor" },
+  baker:      { pass: "1974",           role: "Baker" },
+  supervisor: { pass: "1974",           role: "Supervisor" },
   timson974:  { pass: "anelUedik2616@", role: "Admin" },
 };
 
@@ -735,32 +735,68 @@ async function handlePdfUpload(input) {
       });
     }
 
-    // Parse: look for rows where first column is a known product code
     // PDF structure: Products | Units | Scaling Weight | Total
-    // "Units" column (index 1) = plan qty we want
+    // Key issue: codes like "WROLL30-SAM" appear as split tokens: "WROLL30 -" | "SAM"
+    // We need to reconstruct the code from adjacent cells, then find the Units column number.
+    //
+    // Strategy:
+    // 1. For each row, concatenate all text cells stripping spaces/dashes to form candidate codes
+    // 2. Find the first cell that is purely numeric (the Units value)
+    // 3. Match the reconstructed code against our SECTIONS product codes
+
     const codeMap = buildCodeMap();
+    // Also build a normalised map: strip hyphens/spaces for fuzzy matching
+    const normMap = {};
+    Object.keys(codeMap).forEach(code => {
+      normMap[code.replace(/[-\s]/g, '').toUpperCase()] = codeMap[code];
+    });
+
     let loaded = 0;
     const matched = new Set();
 
     allLines.forEach(cells => {
-      if (!cells.length) return;
-      // First cell might be code, possibly with emoji prefix — strip non-alphanumeric from start
-      const rawCode = cells[0].replace(/^[^A-Za-z0-9]+/, '').toUpperCase();
+      if (cells.length < 2) return;
 
-      // Try exact match first, then try if any known code is found within the cell
-      let prod = codeMap[rawCode];
-      if (!prod) {
-        // Some PDFs merge code with name in one cell — scan for code at start
-        for (const code of Object.keys(codeMap)) {
-          if (rawCode.startsWith(code)) { prod = codeMap[code]; break; }
+      // Try to find a product code by scanning prefix combinations of cells
+      // PDF often splits "WROLL30 -" "SAM" or "WROLL30-" "SAM" across cells
+      let prod = null;
+      let unitsIdx = -1;
+
+      // Build progressive concatenations from the left and test against code maps
+      let combined = '';
+      for (let ci = 0; ci < Math.min(cells.length, 4); ci++) {
+        // Append this cell, normalised (remove spaces, dashes, dots)
+        combined += cells[ci].replace(/[-\s.]/g, '').toUpperCase();
+
+        // Try exact normalised match
+        if (normMap[combined]) {
+          prod = normMap[combined];
+          // Units column: first purely-numeric cell after ci
+          for (let ui = ci + 1; ui < cells.length; ui++) {
+            if (/^\d+(\.\d+)?$/.test(cells[ui].trim())) {
+              unitsIdx = ui;
+              break;
+            }
+          }
+          break;
+        }
+        // Also try exact match on the original code map (no normalisation)
+        const rawJoined = cells.slice(0, ci + 1).join('').replace(/\s*-\s*/g, '-').trim().toUpperCase();
+        if (codeMap[rawJoined]) {
+          prod = codeMap[rawJoined];
+          for (let ui = ci + 1; ui < cells.length; ui++) {
+            if (/^\d+(\.\d+)?$/.test(cells[ui].trim())) {
+              unitsIdx = ui;
+              break;
+            }
+          }
+          break;
         }
       }
 
-      if (prod && !matched.has(prod.code)) {
-        // Units column = cells[1], try to parse as integer
-        const qty = cells.length > 1 ? parseInt(cells[1].replace(/[^0-9]/g, '')) : NaN;
+      if (prod && unitsIdx !== -1 && !matched.has(prod.code)) {
+        const qty = parseInt(cells[unitsIdx]);
         if (!isNaN(qty) && qty >= 0) {
-          // Find the input element for this product code and update it
           const inp = document.querySelector(`.plan-input[data-code="${prod.code}"]`);
           if (inp) {
             inp.value = qty;
