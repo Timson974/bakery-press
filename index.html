@@ -644,7 +644,7 @@ function updateSummary() {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const swCode = `
-const CACHE = 'bakery-press-v2';
+const CACHE = 'bakery-press-v3';
 const ASSETS = ['/bakery-press/', '/bakery-press/index.html'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
@@ -773,42 +773,48 @@ async function handlePdfUpload(input) {
     const matched = new Set();
 
     allLines.forEach(cells => {
-      if (cells.length < 2) return;
+      if (cells.length < 3) return;
 
-      // Try to find a product code by scanning prefix combinations of cells
-      // PDF often splits "WROLL30 -" "SAM" or "WROLL30-" "SAM" across cells
+      // PDF row structure confirmed: [CODE, Name, Units, Scaling Weight, Total]
+      // e.g. ["WROLL30-SAM","WHITE DINNER ROLL","195","0.04 kgs","7.8 kgs"]
+      // or   ["WROLL30 -","SAM","WHITE DINNER ROLL","195","0.04 kgs","7.8 kgs"] (split code)
+      //
+      // Strategy: try cells[0] alone first, then cells[0]+cells[1] combined (for split codes).
+      // Units = first purely-numeric cell starting from index 1 (skip the code cell(s) and name).
+
       let prod = null;
       let unitsIdx = -1;
 
-      // Build progressive concatenations from the left and test against code maps
-      let combined = '';
-      for (let ci = 0; ci < Math.min(cells.length, 4); ci++) {
-        // Append this cell, normalised (remove spaces, dashes, dots)
-        combined += cells[ci].replace(/[-\s.]/g, '').toUpperCase();
+      // Try cells[0] as full code (most common case)
+      const code0 = cells[0].trim().toUpperCase();
+      const norm0 = code0.replace(/[-\s]/g, '');
+      if (codeMap[code0]) {
+        prod = codeMap[code0];
+      } else if (normMap[norm0]) {
+        prod = normMap[norm0];
+      }
 
-        // Try exact normalised match
-        if (normMap[combined]) {
-          prod = normMap[combined];
-          // Units column: first purely-numeric cell after ci
-          for (let ui = ci + 1; ui < cells.length; ui++) {
-            if (/^\d+(\.\d+)?$/.test(cells[ui].trim())) {
-              unitsIdx = ui;
-              break;
-            }
+      if (prod) {
+        // Find Units: first numeric cell after index 0, skipping the product name
+        // Name is usually cells[1] (non-numeric), Units is cells[2]
+        for (let ui = 1; ui < cells.length; ui++) {
+          if (/^\d+(\.\d+)?$/.test(cells[ui].trim())) {
+            unitsIdx = ui;
+            break;
           }
-          break;
         }
-        // Also try exact match on the original code map (no normalisation)
-        const rawJoined = cells.slice(0, ci + 1).join('').replace(/\s*-\s*/g, '-').trim().toUpperCase();
-        if (codeMap[rawJoined]) {
-          prod = codeMap[rawJoined];
-          for (let ui = ci + 1; ui < cells.length; ui++) {
+      } else {
+        // Try split code: cells[0] + cells[1] combined (e.g. "WROLL30 -" + "SAM")
+        const code01 = (cells[0] + cells[1]).replace(/[-\s]/g, '').toUpperCase();
+        if (normMap[code01]) {
+          prod = normMap[code01];
+          // Units: first numeric cell from index 2 onward
+          for (let ui = 2; ui < cells.length; ui++) {
             if (/^\d+(\.\d+)?$/.test(cells[ui].trim())) {
               unitsIdx = ui;
               break;
             }
           }
-          break;
         }
       }
 
