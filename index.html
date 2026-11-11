@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bakery Press Calculator</title>
+<meta name="description" content="Bakery dough press calculator — press counts and dough weights">
+<meta name="theme-color" content="#2c3e50">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Press Calc">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232c3e50'/%3E%3Ctext y='.9em' font-size='72' x='14'%3E🍞%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Bakery%20Press%20Calculator%22%2C%22short_name%22%3A%22Press%20Calc%22%2C%22description%22%3A%22Bakery%20dough%20press%20calculator%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f5f5f0%22%2C%22theme_color%22%3A%22%232c3e50%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520100%2520100'%253E%253Crect%2520width%3D'100'%2520height%3D'100'%2520rx%3D'22'%2520fill%3D'%25232c3e50'%2F%253E%253Ctext%2520y%3D'.9em'%2520font-size%3D'72'%2520x%3D'14'%253E%25F0%259F%258D%259E%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<style>
+  :root {
+    --bg: #f5f5f0;
+    --card: #ffffff;
+    --primary: #2c3e50;
+    --accent: #e67e22;
+    --green: #27ae60;
+    --input-bg: #fffde7;
+    --input-border: #f9a825;
+    --section-bg: #2c3e50;
+    --section-fg: #ffffff;
+    --border: #e0e0e0;
+    --text: #2c3e50;
+    --muted: #95a5a6;
+    --result: #1a5276;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 24px;
+  }
+  .login-box {
+    background: white; border-radius: 16px; padding: 40px 32px; width: 100%; max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-logo { font-size: 48px; text-align: center; margin-bottom: 8px; }
+  .login-title { text-align: center; font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+  .login-sub { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .login-box label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .login-box input {
+    width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px;
+    font-size: 15px; outline: none; transition: border-color 0.2s; margin-bottom: 16px;
+  }
+  .login-box input:focus { border-color: var(--accent); }
+  .login-btn {
+    width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
+    border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .login-btn:hover { background: #d35400; }
+  .login-btn:active { transform: scale(0.98); }
+  .login-error { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 10px; display: none; }
+
+  /* ── APP ── */
+  #app-screen { display: none; }
+  .app-header {
+    background: var(--primary); color: white; padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .app-header-left { display: flex; align-items: center; gap: 10px; }
+  .app-header h1 { font-size: 17px; font-weight: 700; }
+  .app-header .date-badge {
+    background: rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 3px 10px; font-size: 12px;
+  }
+  .logout-btn {
+    background: rgba(255,255,255,0.15); border: none; color: white;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* summary bar */
+  .summary-bar {
+    background: var(--green); color: white;
+    display: flex; justify-content: space-around; padding: 10px 16px;
+    font-size: 13px; gap: 8px; flex-wrap: wrap;
+  }
+  .summary-bar .s-item { text-align: center; }
+  .summary-bar .s-val { font-size: 20px; font-weight: 800; display: block; line-height: 1; }
+  .summary-bar .s-lbl { font-size: 11px; opacity: 0.85; }
+
+  /* date input */
+  .date-row {
+    padding: 12px 16px; background: white; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .date-row label { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .date-row input[type=date] {
+    padding: 7px 12px; border: 2px solid var(--border); border-radius: 8px;
+    font-size: 14px; outline: none;
+  }
+  .date-row input[type=date]:focus { border-color: var(--accent); }
+
+  /* content */
+  .content { padding: 12px 16px; max-width: 900px; margin: 0 auto; }
+
+  /* section */
+  .section-header {
+    background: var(--section-bg); color: var(--section-fg);
+    padding: 10px 14px; border-radius: 10px 10px 0 0;
+    font-size: 14px; font-weight: 700; margin-top: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-body { background: var(--card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 4px; }
+
+  /* table */
+  .press-table { width: 100%; border-collapse: collapse; }
+  .press-table thead th {
+    background: #ecf0f1; font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 10px;
+    text-align: center; border-bottom: 2px solid var(--border);
+  }
+  .press-table thead th:first-child { text-align: left; }
+  .press-table tbody tr { border-bottom: 1px solid var(--border); }
+  .press-table tbody tr:last-child { border-bottom: none; }
+  .press-table tbody tr:hover { background: #fafafa; }
+  .press-table td { padding: 9px 10px; vertical-align: middle; }
+  .prod-name { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .prod-emoji { font-size: 16px; }
+  .prod-label { line-height: 1.2; }
+  .prod-comment { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  /* input cells */
+  .plan-input {
+    width: 70px; padding: 6px 8px; border: 2px solid var(--input-border);
+    background: var(--input-bg); border-radius: 7px; font-size: 14px; font-weight: 700;
+    text-align: center; color: var(--result); outline: none; transition: border-color 0.2s;
+  }
+  .plan-input:focus { border-color: var(--accent); background: #fff9c4; }
+  .num-cell { text-align: center; font-size: 13px; color: var(--muted); }
+  .presses-cell {
+    text-align: center; font-size: 20px; font-weight: 800;
+    color: var(--green); min-width: 50px;
+  }
+  .presses-cell.zero { color: #bdc3c7; }
+  .dough-cell {
+    text-align: center; font-size: 14px; font-weight: 700; color: var(--result);
+  }
+  .dash { color: #ddd; }
+
+  /* mobile tweaks */
+  @media (max-width: 600px) {
+    .press-table thead th:nth-child(3),
+    .press-table tbody td:nth-child(3) { display: none; } /* hide Ea/Press on mobile */
+    .plan-input { width: 60px; font-size: 13px; }
+    .presses-cell { font-size: 18px; }
+  }
+
+  /* footer */
+  .footer { text-align: center; padding: 20px 16px; color: var(--muted); font-size: 11px; }
+
+  /* ── INSTALL BANNER ── */
+  #install-banner {
+    display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--primary); color: white; border-radius: 14px;
+    padding: 12px 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: none; align-items: center; gap: 12px; z-index: 999;
+    max-width: calc(100vw - 32px); width: max-content;
+  }
+  #install-banner .ib-text { font-size: 13px; line-height: 1.3; }
+  #install-banner .ib-text strong { display: block; font-size: 14px; }
+  #install-banner .ib-btn {
+    background: var(--accent); border: none; color: white;
+    padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+  }
+  #install-banner .ib-close {
+    background: none; border: none; color: rgba(255,255,255,0.6);
+    font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🍞</div>
+    <div class="login-title">Bakery Press Calculator</div>
+    <div class="login-sub">Sign in to continue</div>
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error">❌ Invalid username or password</div>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app-screen">
+  <div class="app-header">
+    <div class="app-header-left">
+      <span style="font-size:22px">🍞</span>
+      <div>
+        <h1>Press Calculator</h1>
+        <div class="date-badge" id="header-date"></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;opacity:0.7" id="user-badge"></span>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="s-item"><span class="s-val" id="total-presses">0</span><span class="s-lbl">Total Presses</span></div>
+    <div class="s-item"><span class="s-val" id="total-dough">0.0</span><span class="s-lbl">Total Dough (kg)</span></div>
+    <div class="s-item"><span class="s-val" id="active-lines">0</span><span class="s-lbl">Active Products</span></div>
+  </div>
+
+  <div class="date-row">
+    <label>Production date:</label>
+    <input type="date" id="prod-date" onchange="updateDate()">
+  </div>
+
+  <div class="content" id="tables-container"></div>
+  <div class="footer">Bakery Press Calculator · All rights reserved</div>
+</div>
+
+<!-- Install to home screen banner -->
+<div id="install-banner">
+  <span style="font-size:28px">🍞</span>
+  <div class="ib-text">
+    <strong>Add to Home Screen</strong>
+    Open as an app — works offline
+  </div>
+  <button class="ib-btn" id="install-btn">Install</button>
+  <button class="ib-close" onclick="document.getElementById('install-banner').style.display='none'">✕</button>
+</div>
+
+<script>
+// ── CREDENTIALS ──────────────────────────────────────────────────────────────
+const USERS = {
+  baker:      { pass: "dough2024",   role: "Baker" },
+  supervisor: { pass: "bakery2024",  role: "Supervisor" },
+  timson974:  { pass: "anelUedik2616@", role: "Admin" },
+};
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+// logic: "press" | "direct"
+// press: ea_per_press, press_wt, comment
+// direct: press_wt (= scaling weight per unit), comment
+const SECTIONS = [
+  { icon:"🍞", title:"Dinner Rolls", products:[
+    { code:"WROLL30-SAM",  name:"White Dinner Roll",     logic:"press", plan:135, ea:36, pw:1.44,  comment:"36 ea × 0.040 kg" },
+    { code:"WMROLL30-SAM", name:"Wholemeal Dinner Roll", logic:"press", plan:135, ea:36, pw:1.44,  comment:"36 ea × 0.040 kg" },
+    { code:"MGROLL30-SAM", name:"Multiseed Dinner Roll", logic:"press", plan:15,  ea:36, pw:1.44,  comment:"36 ea × 0.040 kg" },
+    { code:"OLIVROLL30",   name:"Olive Dinner Roll",     logic:"press", plan:30,  ea:36, pw:1.224, comment:"36 ea × 0.034 kg" },
+  ]},
+  { icon:"🫓", title:"Baps", products:[
+    { code:"WMBAP40-SAM",  name:"Wholemeal Bap Small",       logic:"press", plan:35, ea:36, pw:1.80, comment:"36 ea × 0.050 kg" },
+    { code:"MWBAP90",      name:"Malted Wheat Bap Large",    logic:"press", plan:6,  ea:30, pw:3.00, comment:"30 ea × 0.100 kg" },
+    { code:"EBAP40-SAM",   name:"White Bap Floury Small",    logic:"press", plan:35, ea:36, pw:1.80, comment:"36 ea × 0.050 kg" },
+    { code:"CIABAP70-SAM", name:"Ciabatta Bap Medium",       logic:"press", plan:60, ea:30, pw:2.40, comment:"30 ea × 0.080 kg" },
+  ]},
+  { icon:"🧁", title:"Muffins", products:[
+    { code:"TEM60-SAM",  name:"English Muffin Standard",       logic:"press", plan:30, ea:30, pw:2.10, comment:"30 ea × 0.070 kg" },
+    { code:"SEM80-SAM",  name:"Spelt English Muffin Large",    logic:"press", plan:15, ea:30, pw:3.00, comment:"30 ea × 0.100 kg" },
+  ]},
+  { icon:"🥖", title:"Ciabatta", products:[
+    { code:"CIABAG120",  name:"Ciabatta Baguette 120g",   logic:"press",  plan:1,  ea:16, pw:2.24,  comment:"16 ea × 0.140 kg" },
+    { code:"CIABAP110",  name:"Ciabatta 110g Long Bap",   logic:"press",  plan:25, ea:16, pw:2.08,  comment:"16 ea × 0.130 kg" },
+    { code:"CIA300",     name:"Ciabatta 300g",            logic:"direct", plan:4,  pw:0.400, comment:"Scale by unit" },
+    { code:"CIA800",     name:"Ciabatta 800g",            logic:"direct", plan:1,  pw:0.900, comment:"Scale by unit" },
+    { code:"CIAOLI300",  name:"Ciabatta Olive 300g",      logic:"direct", plan:2,  pw:0.3375,comment:"Dough only – olive 10% (0.375 × 90%)" },
+    { code:"CIAOLI800",  name:"Ciabatta Olive 800g",      logic:"direct", plan:1,  pw:0.8442,comment:"Dough only – olive 10% (0.938 × 90%)" },
+  ]},
+  { icon:"🫒", title:"Focaccia", products:[
+    { code:"FOCR1250",    name:"Focaccia Half Slab 1250g",       logic:"direct", plan:9,  pw:1.515, comment:"Scale by unit" },
+    { code:"FOCR400",     name:"Focaccia Round 400g (+5 café)",  logic:"direct", plan:9,  pw:0.450, comment:"Plan 4 + 5 café extra = 9" },
+    { code:"FOCR800",     name:"Focaccia Long 800g",             logic:"direct", plan:19, pw:1.010, comment:"Scale by unit" },
+    { code:"FOCRT600",    name:"Focaccia Long Tin 600g",         logic:"direct", plan:1,  pw:0.750, comment:"Scale by unit" },
+    { code:"FOCRT600-CF", name:"Focaccia Long Tin 600g – Café",  logic:"direct", plan:1,  pw:0.750, comment:"Scale by unit" },
+  ]},
+  { icon:"🐯", title:"Tiger Bread & Panini", products:[
+    { code:"TGRBRD",    name:"Tiger Bread Sub 120g", logic:"press",  plan:250, ea:15, pw:2.175, comment:"15 ea × 0.145 kg" },
+    { code:"PANINI120", name:"Panini Large",         logic:"press",  plan:32,  ea:36, pw:5.040, comment:"36 ea × 0.140 kg" },
+  ]},
+  { icon:"🥐", title:"Baguettes", products:[
+    { code:"WMBAG300", name:"Wholemeal Baguette 300g", logic:"press", plan:60, ea:24, pw:9.600, comment:"24 ea × 0.400 kg" },
+  ]},
+  { icon:"🍱", title:"Sandwich Tins 800g  (12 ea / press = 12 kg)", products:[
+    { code:"WTIN800",   name:"White Tin 800g",             logic:"press", plan:26, ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"WMTIN800",  name:"Wholemeal Tin 800g",         logic:"press", plan:21, ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"AMSTIN800", name:"Multiseed Tin 800g",         logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"MWTIN800",  name:"Malted Wheat Tin 800g",      logic:"press", plan:6,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"BMTINOP800",name:"Buttermilk Tin 800g",        logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"CF-BTRMLK", name:"Café Buttermilk Tin 800g",   logic:"press", plan:5,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"WBSTIN800", name:"Basil & Spinach Tin 800g",   logic:"press", plan:3,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+    { code:"SHOKTIN600",name:"Shokupan Tin 600g",          logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+  ]},
+  { icon:"🍱", title:"Sandwich Tins 1600g  (6 ea / press = 12 kg)", products:[
+    { code:"WTIN1600",   name:"White Tin 1600g",             logic:"press", plan:11, ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"WMTIN1600",  name:"Wholemeal Tin 1600g",         logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"AMSTIN1600", name:"Multiseed Tin 1600g",         logic:"press", plan:1,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"MWTIN1600",  name:"Malted Wheat Tin 1600g",      logic:"press", plan:4,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"SPETIN1600", name:"Spelt Tin 1600g",             logic:"press", plan:1,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"WBSTIN1600", name:"Basil & Spinach Tin 1600g",   logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"WTOMTIN1600",name:"Tomato & Basil Tin 1600g",    logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+    { code:"SHOKTIN1200",name:"Shokupan Tin 1200g",          logic:"press", plan:3,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+  ]},
+  { icon:"🌾", title:"Bloomers & Cobs", products:[
+    { code:"WB400",  name:"White Bloomer 400g",        logic:"direct", plan:1,  pw:0.500, comment:"Scale by unit" },
+    { code:"WB800",  name:"White Bloomer 800g",        logic:"direct", plan:21, pw:1.000, comment:"Scale by unit" },
+    { code:"WM800",  name:"Wholemeal Bloomer 800g",    logic:"direct", plan:13, pw:1.000, comment:"Scale by unit" },
+    { code:"AMS400", name:"Multiseed Cob 400g",        logic:"direct", plan:5,  pw:0.500, comment:"Scale by unit" },
+    { code:"AMS800", name:"Multiseed Bloomer 800g",    logic:"direct", plan:20, pw:1.000, comment:"Scale by unit" },
+    { code:"MW800",  name:"Malted Wheat Bloomer 800g", logic:"direct", plan:5,  pw:1.000, comment:"Scale by unit" },
+  ]},
+];
+
+// Product emoji map
+const EMOJI = {
+  "WROLL30-SAM":"⚪","WMROLL30-SAM":"🟤","MGROLL30-SAM":"🌱","OLIVROLL30":"🫒",
+  "WMBAP40-SAM":"🟤","MWBAP90":"🌾","EBAP40-SAM":"⚪","CIABAP70-SAM":"🥖",
+  "TEM60-SAM":"🧁","SEM80-SAM":"🌾",
+  "CIABAG120":"🥖","CIABAP110":"🥖","CIA300":"🥖","CIA800":"🥖","CIAOLI300":"🫒","CIAOLI800":"🫒",
+  "FOCR1250":"🫒","FOCR400":"🫒","FOCR800":"🫒","FOCRT600":"🫒","FOCRT600-CF":"☕",
+  "TGRBRD":"🐯","PANINI120":"🥪",
+  "WMBAG300":"🥐",
+  "WTIN800":"⬜","WMTIN800":"🟫","AMSTIN800":"🌱","MWTIN800":"🌾","BMTINOP800":"🥛","CF-BTRMLK":"☕","WBSTIN800":"🌿","SHOKTIN600":"🍞",
+  "WTIN1600":"⬜","WMTIN1600":"🟫","AMSTIN1600":"🌱","MWTIN1600":"🌾","SPETIN1600":"🌾","WBSTIN1600":"🌿","WTOMTIN1600":"🍅","SHOKTIN1200":"🍞",
+  "WB400":"⬜","WB800":"⬜","WM800":"🟫","AMS400":"🌱","AMS800":"🌱","MW800":"🌾",
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentUser = null;
+const planState = {}; // code → plan qty
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function doLogin() {
+  const u = document.getElementById('username').value.trim().toLowerCase();
+  const p = document.getElementById('password').value;
+  if (USERS[u] && USERS[u].pass === p) {
+    currentUser = { username: u, role: USERS[u].role };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('user-badge').textContent = `👤 ${USERS[u].role}`;
+    initApp();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+document.getElementById('password').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+// ── APP INIT ──────────────────────────────────────────────────────────────────
+function initApp() {
+  // set today's date
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0];
+  document.getElementById('prod-date').value = dateStr;
+  updateDate();
+  buildTables();
+  recalcAll();
+}
+
+function updateDate() {
+  const d = document.getElementById('prod-date').value;
+  if (!d) return;
+  const dt = new Date(d + 'T12:00:00');
+  document.getElementById('header-date').textContent = dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+
+function buildTables() {
+  const container = document.getElementById('tables-container');
+  container.innerHTML = '';
+
+  SECTIONS.forEach(section => {
+    const wrap = document.createElement('div');
+
+    // Section header
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.innerHTML = `<span>${section.icon}</span><span>${section.title}</span>`;
+    wrap.appendChild(hdr);
+
+    // Table
+    const body = document.createElement('div');
+    body.className = 'section-body';
+
+    const tbl = document.createElement('table');
+    tbl.className = 'press-table';
+    tbl.innerHTML = `<thead><tr>
+      <th style="text-align:left">Product</th>
+      <th>Plan (qty)</th>
+      <th>Ea / Press</th>
+      <th>Press Wt (kg)</th>
+      <th>Presses</th>
+      <th>Dough (kg)</th>
+    </tr></thead>`;
+
+    const tbody = document.createElement('tbody');
+    section.products.forEach(prod => {
+      planState[prod.code] = prod.plan;
+      const tr = document.createElement('tr');
+      const emoji = EMOJI[prod.code] || '🍞';
+
+      const eaCell  = prod.logic === 'press' ? prod.ea   : '–';
+      const pwCell  = prod.pw.toFixed(3);
+
+      tr.innerHTML = `
+        <td class="prod-name">
+          <span class="prod-emoji">${emoji}</span>
+          <div class="prod-label">
+            <div>${prod.name}</div>
+            <div class="prod-comment">${prod.comment}</div>
+          </div>
+        </td>
+        <td class="num-cell">
+          <input class="plan-input" type="number" min="0" value="${prod.plan}"
+            data-code="${prod.code}" data-logic="${prod.logic}"
+            data-ea="${prod.logic==='press'?prod.ea:0}" data-pw="${prod.pw}"
+            oninput="onPlanChange(this)">
+        </td>
+        <td class="num-cell">${eaCell}</td>
+        <td class="num-cell">${pwCell}</td>
+        <td class="presses-cell" id="presses-${prod.code}">–</td>
+        <td class="dough-cell"  id="dough-${prod.code}">–</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbl.appendChild(tbody);
+    body.appendChild(tbl);
+    wrap.appendChild(body);
+    container.appendChild(wrap);
+  });
+}
+
+function onPlanChange(input) {
+  const code  = input.dataset.code;
+  const logic = input.dataset.logic;
+  const ea    = parseFloat(input.dataset.ea);
+  const pw    = parseFloat(input.dataset.pw);
+  const plan  = parseInt(input.value) || 0;
+  planState[code] = plan;
+
+  let presses = null, dough = 0;
+  if (logic === 'press') {
+    presses = Math.ceil(plan / ea);
+    dough   = presses * pw;
+  } else {
+    dough = plan * pw;
+  }
+
+  const pCell = document.getElementById('presses-' + code);
+  const dCell = document.getElementById('dough-' + code);
+
+  if (logic === 'press') {
+    pCell.textContent = presses;
+    pCell.className = 'presses-cell' + (presses === 0 ? ' zero' : '');
+  } else {
+    pCell.innerHTML = '<span class="dash">–</span>';
+  }
+  dCell.textContent = dough.toFixed(3);
+
+  updateSummary();
+}
+
+function recalcAll() {
+  document.querySelectorAll('.plan-input').forEach(input => onPlanChange(input));
+}
+
+// ── PWA INSTALL PROMPT ───────────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('install-banner');
+  banner.style.display = 'flex';
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').style.display = 'none';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+  deferredPrompt = null;
+});
+
+function updateSummary() {
+  let totalPresses = 0, totalDough = 0, activeLines = 0;
+  document.querySelectorAll('.plan-input').forEach(input => {
+    const plan = parseInt(input.value) || 0;
+    if (plan > 0) activeLines++;
+    const logic = input.dataset.logic;
+    const ea    = parseFloat(input.dataset.ea);
+    const pw    = parseFloat(input.dataset.pw);
+    if (logic === 'press') {
+      const p = Math.ceil(plan / ea);
+      totalPresses += p;
+      totalDough   += p * pw;
+    } else {
+      totalDough += plan * pw;
+    }
+  });
+  document.getElementById('total-presses').textContent = totalPresses;
+  document.getElementById('total-dough').textContent   = totalDough.toFixed(1);
+  document.getElementById('active-lines').textContent  = activeLines;
+}
+</script>
+</body>
+</html>
