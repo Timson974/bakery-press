@@ -768,10 +768,15 @@ async function handlePdfUpload(input) {
     console.log('codeMap keys:', Object.keys(buildCodeMap()).join(', '));
 
     const codeMap = buildCodeMap();
-    // Also build a normalised map: strip hyphens/spaces for fuzzy matching
+    // Build a normalised map: strip hyphens/spaces for fuzzy matching
+    // Also add entries without the "-SAM" suffix since PDF sometimes omits it
     const normMap = {};
     Object.keys(codeMap).forEach(code => {
-      normMap[code.replace(/[-\s]/g, '').toUpperCase()] = codeMap[code];
+      const norm = code.replace(/[-\s]/g, '').toUpperCase();
+      normMap[norm] = codeMap[code];
+      // Also map the code without -SAM suffix (e.g. WROLL30SAM → also register WROLL30)
+      const withoutSam = norm.replace(/SAM$/, '');
+      if (withoutSam !== norm) normMap[withoutSam] = codeMap[code];
     });
 
     let loaded = 0;
