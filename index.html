@@ -4,252 +4,379 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Bakery Press Calculator</title>
-<meta name="description" content="Bakery dough press calculator — press counts and dough weights">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <meta name="theme-color" content="#2c3e50">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Press Calc">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
 <link rel="manifest" href="manifest.json">
 <style>
   :root {
-    --bg: #f5f5f0;
-    --card: #ffffff;
-    --primary: #2c3e50;
-    --accent: #e67e22;
-    --green: #27ae60;
-    --input-bg: #fffde7;
-    --input-border: #f9a825;
-    --section-bg: #2c3e50;
-    --section-fg: #ffffff;
-    --border: #e0e0e0;
-    --text: #2c3e50;
-    --muted: #95a5a6;
-    --result: #1a5276;
+    --bg: #f5f5f0; --card: #ffffff; --primary: #2c3e50; --accent: #e67e22;
+    --green: #27ae60; --input-bg: #fffde7; --input-border: #f9a825;
+    --section-bg: #2c3e50; --section-fg: #ffffff; --border: #e0e0e0;
+    --text: #2c3e50; --muted: #95a5a6; --result: #1a5276;
     --shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh; }
 
   /* ── LOGIN ── */
   #login-screen {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100vh; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    padding: 24px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 20px; background: var(--primary);
   }
   .login-box {
-    background: white; border-radius: 16px; padding: 40px 32px; width: 100%; max-width: 380px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    background: white; border-radius: 20px; padding: 32px 28px;
+    width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   }
   .login-logo { font-size: 48px; text-align: center; margin-bottom: 8px; }
-  .login-title { text-align: center; font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-  .login-sub { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 28px; }
-  .login-box label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .login-title { font-size: 20px; font-weight: 800; text-align: center; color: var(--primary); margin-bottom: 4px; }
+  .login-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 24px; }
+  .login-box label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
   .login-box input {
-    width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px;
-    font-size: 15px; outline: none; transition: border-color 0.2s; margin-bottom: 16px;
+    width: 100%; padding: 12px 14px; border: 2px solid var(--border);
+    border-radius: 10px; font-size: 15px; outline: none; margin-bottom: 14px;
+    transition: border-color 0.2s;
   }
   .login-box input:focus { border-color: var(--accent); }
   .login-btn {
-    width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
-    border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    width: 100%; padding: 14px; background: var(--primary); color: white;
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
+    cursor: pointer; margin-top: 4px;
   }
-  .login-btn:hover { background: #d35400; }
-  .login-btn:active { transform: scale(0.98); }
+  .login-btn:active { opacity: 0.85; }
   .login-error { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 10px; display: none; }
 
   /* ── APP ── */
   #app-screen { display: none; }
   .app-header {
-    background: var(--primary); color: white; padding: 14px 16px;
+    background: var(--primary); color: white; padding: 12px 16px;
     display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   .app-header-left { display: flex; align-items: center; gap: 10px; }
-  .app-header h1 { font-size: 17px; font-weight: 700; }
-  .app-header .date-badge {
-    background: rgba(255,255,255,0.15); border-radius: 20px;
-    padding: 3px 10px; font-size: 12px;
-  }
-  .logout-btn {
+  .app-header h1 { font-size: 18px; font-weight: 800; }
+  .date-badge { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 6px; }
+  .lang-btn {
     background: rgba(255,255,255,0.15); border: none; color: white;
-    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;
+    padding: 5px 8px; border-radius: 7px; font-size: 11px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.3px;
   }
-  .logout-btn:hover { background: rgba(255,255,255,0.25); }
+  .lang-btn.active { background: var(--accent); }
+  .logout-btn {
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    cursor: pointer;
+  }
 
   /* summary bar */
   .summary-bar {
-    background: var(--green); color: white;
-    display: flex; justify-content: space-around; padding: 10px 16px;
-    font-size: 13px; gap: 8px; flex-wrap: wrap;
+    background: var(--green); color: white; padding: 10px 16px;
+    display: flex; justify-content: space-around;
   }
-  .summary-bar .s-item { text-align: center; }
-  .summary-bar .s-val { font-size: 20px; font-weight: 800; display: block; line-height: 1; }
-  .summary-bar .s-lbl { font-size: 11px; opacity: 0.85; }
+  .s-item { text-align: center; }
+  .s-val { font-size: 22px; font-weight: 900; display: block; line-height: 1.1; }
+  .s-lbl { font-size: 10px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* date input */
+  /* date row */
   .date-row {
-    padding: 12px 16px; background: white; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; background: white; border-bottom: 1px solid var(--border);
   }
-  .date-row label { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .date-row label { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
   .date-row input[type=date] {
-    padding: 7px 12px; border: 2px solid var(--border); border-radius: 8px;
-    font-size: 14px; outline: none;
+    flex: 1; padding: 7px 10px; border: 2px solid var(--border);
+    border-radius: 8px; font-size: 14px; outline: none;
   }
-  .date-row input[type=date]:focus { border-color: var(--accent); }
+
+  /* PDF button */
+  .pdf-btn {
+    padding: 7px 12px; background: var(--accent); color: white;
+    border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .pdf-btn:active { opacity: 0.8; }
+  .pdf-btn.loading { opacity: 0.6; pointer-events: none; }
+
+  /* PDF toast notification */
+  .pdf-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #2c3e50; color: white; padding: 12px 20px;
+    border-radius: 12px; font-size: 14px; font-weight: 600;
+    z-index: 9999; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    text-align: center; max-width: 300px;
+    animation: toastIn 0.25s ease;
+  }
+  .pdf-toast.success { background: var(--green); }
+  .pdf-toast.error   { background: #e74c3c; }
+  @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
 
   /* content */
-  .content { padding: 12px 16px; max-width: 900px; margin: 0 auto; }
+  .content { padding: 10px 12px 20px; max-width: 700px; margin: 0 auto; }
 
-  /* section */
+  /* section header */
   .section-header {
     background: var(--section-bg); color: var(--section-fg);
     padding: 10px 14px; border-radius: 10px 10px 0 0;
-    font-size: 14px; font-weight: 700; margin-top: 18px;
+    font-size: 14px; font-weight: 700; margin-top: 16px;
     display: flex; align-items: center; gap: 8px;
   }
-  .section-body { background: var(--card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 4px; }
-
-  /* table */
-  .press-table { width: 100%; border-collapse: collapse; }
-  .press-table thead th {
-    background: #ecf0f1; font-size: 11px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 10px;
-    text-align: center; border-bottom: 2px solid var(--border);
+  .section-body {
+    background: var(--card); border: 1px solid var(--border);
+    border-top: none; border-radius: 0 0 10px 10px;
+    overflow: hidden; box-shadow: var(--shadow); margin-bottom: 4px;
   }
-  .press-table thead th:first-child { text-align: left; }
-  .press-table tbody tr { border-bottom: 1px solid var(--border); }
-  .press-table tbody tr:last-child { border-bottom: none; }
-  .press-table tbody tr:hover { background: #fafafa; }
-  .press-table td { padding: 9px 10px; vertical-align: middle; }
-  .prod-name { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-  .prod-emoji { font-size: 16px; }
-  .prod-label { line-height: 1.2; }
+
+  /* ── PRODUCT ROW (mobile-first card layout) ── */
+  .prod-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .prod-row:last-child { border-bottom: none; }
+
+  /* top-left: name + comment */
+  .prod-info {
+    display: flex; align-items: flex-start; gap: 8px;
+    grid-column: 1; grid-row: 1;
+  }
+  .prod-emoji { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .prod-label { line-height: 1.25; }
+  .prod-name-text { font-size: 13px; font-weight: 600; color: var(--text); }
   .prod-comment { font-size: 10px; color: var(--muted); margin-top: 1px; }
 
-  /* input cells */
+  /* top-right: plan input */
+  .plan-wrap {
+    grid-column: 2; grid-row: 1;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+  }
+  .plan-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
   .plan-input {
-    width: 70px; padding: 6px 8px; border: 2px solid var(--input-border);
-    background: var(--input-bg); border-radius: 7px; font-size: 14px; font-weight: 700;
-    text-align: center; color: var(--result); outline: none; transition: border-color 0.2s;
+    width: 72px; padding: 7px 6px; border: 2px solid var(--input-border);
+    background: var(--input-bg); border-radius: 8px; font-size: 16px; font-weight: 800;
+    text-align: center; color: var(--result); outline: none;
   }
   .plan-input:focus { border-color: var(--accent); background: #fff9c4; }
-  .num-cell { text-align: center; font-size: 13px; color: var(--muted); }
-  .presses-cell {
-    text-align: center; font-size: 20px; font-weight: 800;
-    color: var(--green); min-width: 50px;
-  }
-  .presses-cell.zero { color: #bdc3c7; }
-  .dough-cell {
-    text-align: center; font-size: 14px; font-weight: 700; color: var(--result);
-  }
-  .dash { color: #ddd; }
 
-  /* mobile tweaks */
-  @media (max-width: 600px) {
-    .press-table thead th:nth-child(3),
-    .press-table tbody td:nth-child(3) { display: none; } /* hide Ea/Press on mobile */
-    .plan-input { width: 60px; font-size: 13px; }
-    .presses-cell { font-size: 18px; }
+  /* bottom: result pills */
+  .prod-results {
+    grid-column: 1 / -1; grid-row: 2;
+    display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap;
   }
+  .pill {
+    display: flex; flex-direction: column; align-items: center;
+    background: #f8f9fa; border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 10px; min-width: 60px;
+  }
+  .pill-val { font-size: 15px; font-weight: 800; color: var(--result); line-height: 1.1; }
+  .pill-val.green { color: var(--green); }
+  .pill-val.zero { color: #bdc3c7; }
+  .pill-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 1px; }
 
   /* footer */
   .footer { text-align: center; padding: 20px 16px; color: var(--muted); font-size: 11px; }
 
-  /* ── INSTALL BANNER ── */
+  /* install banner */
   #install-banner {
     display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
     background: var(--primary); color: white; border-radius: 14px;
     padding: 12px 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    display: none; align-items: center; gap: 12px; z-index: 999;
+    align-items: center; gap: 12px; z-index: 999;
     max-width: calc(100vw - 32px); width: max-content;
   }
   #install-banner .ib-text { font-size: 13px; line-height: 1.3; }
   #install-banner .ib-text strong { display: block; font-size: 14px; }
   #install-banner .ib-btn {
     background: var(--accent); border: none; color: white;
-    padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 700;
-    cursor: pointer; white-space: nowrap;
+    padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer;
   }
   #install-banner .ib-close {
     background: none; border: none; color: rgba(255,255,255,0.6);
-    font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
+    font-size: 18px; cursor: pointer; padding: 0 2px;
+  }
+
+  /* desktop: show table headers */
+  @media (min-width: 601px) {
+    .prod-row {
+      grid-template-columns: 1fr 80px 80px 70px 80px;
+      grid-template-rows: 1fr;
+      align-items: center;
+      gap: 0 8px;
+    }
+    .prod-info { grid-column: 1; grid-row: 1; }
+    .plan-wrap { grid-column: 2; grid-row: 1; align-items: center; }
+    .prod-results { grid-column: 3 / -1; grid-row: 1; margin-top: 0; flex-wrap: nowrap; }
+    .pill { min-width: unset; flex: 1; }
+    .section-thead {
+      display: grid;
+      grid-template-columns: 1fr 80px 80px 70px 80px;
+      padding: 6px 12px; gap: 0 8px;
+      background: #ecf0f1; border-bottom: 2px solid var(--border);
+    }
+    .thead-cell {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.4px; text-align: center;
+    }
+    .thead-cell:first-child { text-align: left; }
+  }
+  @media (max-width: 600px) {
+    .section-thead { display: none; }
   }
 </style>
 </head>
 <body>
 
-<!-- ══════════════ LOGIN ══════════════ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">🍞</div>
-    <div class="login-title">Bakery Press Calculator</div>
-    <div class="login-sub">Sign in to continue</div>
-    <label>Username</label>
+    <div class="login-title" data-i18n="appTitle">Bakery Press Calculator</div>
+    <div class="login-sub" data-i18n="signInPrompt">Sign in to continue</div>
+    <label data-i18n="username">Username</label>
     <input type="text" id="username" placeholder="Enter username" autocomplete="username">
-    <label>Password</label>
-    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
-    <button class="login-btn" onclick="doLogin()">Sign In</button>
-    <div class="login-error" id="login-error">❌ Invalid username or password</div>
+    <label data-i18n="password">Password</label>
+    <input type="password" id="password" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()" data-i18n="signIn">Sign In</button>
+    <div class="login-error" id="login-error" data-i18n="loginError">❌ Invalid username or password</div>
   </div>
 </div>
 
-<!-- ══════════════ APP ══════════════ -->
+<!-- APP -->
 <div id="app-screen">
   <div class="app-header">
     <div class="app-header-left">
       <span style="font-size:22px">🍞</span>
       <div>
-        <h1>Press Calculator</h1>
+        <h1 data-i18n="appTitle">Press Calculator</h1>
         <div class="date-badge" id="header-date"></div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:12px;opacity:0.7" id="user-badge"></span>
-      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    <div class="header-right">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn" onclick="setLang('kz')">KZ</button>
+      <button class="lang-btn" onclick="setLang('pl')">PL</button>
+      <span style="font-size:11px;opacity:0.7;margin-left:4px" id="user-badge"></span>
+      <button class="logout-btn" onclick="doLogout()" data-i18n="signOut">Sign out</button>
     </div>
   </div>
 
   <div class="summary-bar">
-    <div class="s-item"><span class="s-val" id="total-presses">0</span><span class="s-lbl">Total Presses</span></div>
-    <div class="s-item"><span class="s-val" id="total-dough">0.0</span><span class="s-lbl">Total Dough (kg)</span></div>
-    <div class="s-item"><span class="s-val" id="active-lines">0</span><span class="s-lbl">Active Products</span></div>
+    <div class="s-item"><span class="s-val" id="total-presses">0</span><span class="s-lbl" data-i18n="totalPresses">Total Presses</span></div>
+    <div class="s-item"><span class="s-val" id="total-dough">0.0</span><span class="s-lbl" data-i18n="totalDough">Total Dough (kg)</span></div>
+    <div class="s-item"><span class="s-val" id="active-lines">0</span><span class="s-lbl" data-i18n="activeProducts">Active Products</span></div>
   </div>
 
   <div class="date-row">
-    <label>Production date:</label>
+    <label data-i18n="prodDate">Production date:</label>
     <input type="date" id="prod-date" onchange="updateDate()">
+    <button class="pdf-btn" onclick="document.getElementById('pdf-file-input').click()" data-i18n="loadPdf">📄 Load PDF</button>
+    <input type="file" id="pdf-file-input" accept=".pdf" style="display:none" onchange="handlePdfUpload(this)">
   </div>
+  <div id="pdf-toast" class="pdf-toast" style="display:none"></div>
 
   <div class="content" id="tables-container"></div>
-  <div class="footer">Bakery Press Calculator · All rights reserved</div>
+  <div class="footer" data-i18n="footer">Bakery Press Calculator · All rights reserved</div>
 </div>
 
-<!-- Install to home screen banner -->
+<!-- Install banner -->
 <div id="install-banner">
   <span style="font-size:28px">🍞</span>
   <div class="ib-text">
-    <strong>Add to Home Screen</strong>
-    Open as an app — works offline
+    <strong data-i18n="installTitle">Add to Home Screen</strong>
+    <span data-i18n="installSub">Open as an app — works offline</span>
   </div>
-  <button class="ib-btn" id="install-btn">Install</button>
+  <button class="ib-btn" id="install-btn" data-i18n="install">Install</button>
   <button class="ib-close" onclick="document.getElementById('install-banner').style.display='none'">✕</button>
 </div>
 
 <script>
 // ── CREDENTIALS ──────────────────────────────────────────────────────────────
 const USERS = {
-  baker:      { pass: "dough2024",   role: "Baker" },
-  supervisor: { pass: "bakery2024",  role: "Supervisor" },
+  baker:      { pass: "dough2024",      role: "Baker" },
+  supervisor: { pass: "bakery2024",     role: "Supervisor" },
   timson974:  { pass: "anelUedik2616@", role: "Admin" },
 };
 
-// ── DATA ─────────────────────────────────────────────────────────────────────
-// logic: "press" | "direct"
-// press: ea_per_press, press_wt, comment
-// direct: press_wt (= scaling weight per unit), comment
+// ── I18N ──────────────────────────────────────────────────────────────────────
+const LANGS = {
+  en: {
+    appTitle:"Press Calculator", signInPrompt:"Sign in to continue",
+    username:"Username", password:"Password", signIn:"Sign In",
+    loginError:"❌ Invalid username or password", signOut:"Sign out",
+    totalPresses:"Total Presses", totalDough:"Total Dough (kg)", activeProducts:"Active Products",
+    prodDate:"Production date:", footer:"Bakery Press Calculator · All rights reserved",
+    installTitle:"Add to Home Screen", installSub:"Open as an app — works offline", install:"Install",
+    plan:"Plan", presses:"Presses", dough:"Dough (kg)", direct:"Direct",
+    loadPdf:"Load PDF", pdfLoaded:"Loaded {n} products from PDF", pdfError:"Could not read PDF", pdfNone:"No matching products found in PDF",
+  },
+  ru: {
+    appTitle:"Калькулятор прессов", signInPrompt:"Войдите чтобы продолжить",
+    username:"Логин", password:"Пароль", signIn:"Войти",
+    loginError:"❌ Неверный логин или пароль", signOut:"Выйти",
+    totalPresses:"Всего прессов", totalDough:"Тесто всего (кг)", activeProducts:"Активных продуктов",
+    prodDate:"Дата производства:", footer:"Калькулятор прессов пекарни · Все права защищены",
+    installTitle:"Добавить на экран", installSub:"Работает как приложение оффлайн", install:"Установить",
+    plan:"План", presses:"Прессов", dough:"Тесто (кг)", direct:"Прямой",
+    loadPdf:"Загрузить PDF", pdfLoaded:"Загружено {n} продуктов из PDF", pdfError:"Не удалось прочитать PDF", pdfNone:"В PDF не найдено совпадений",
+  },
+  kz: {
+    appTitle:"Пресс калькуляторы", signInPrompt:"Жалғастыру үшін кіріңіз",
+    username:"Логин", password:"Құпия сөз", signIn:"Кіру",
+    loginError:"❌ Қате логин немесе құпия сөз", signOut:"Шығу",
+    totalPresses:"Барлық пресстер", totalDough:"Барлық қамыр (кг)", activeProducts:"Белсенді өнімдер",
+    prodDate:"Өндіріс күні:", footer:"Пекарня пресс калькуляторы · Барлық құқықтар қорғалған",
+    installTitle:"Басты экранға қосу", installSub:"Қолданба ретінде жұмыс істейді", install:"Орнату",
+    plan:"Жоспар", presses:"Пресстер", dough:"Қамыр (кг)", direct:"Тікелей",
+    loadPdf:"PDF жүктеу", pdfLoaded:"PDF-тен {n} өнім жүктелді", pdfError:"PDF оқу қатесі", pdfNone:"PDF-те сәйкестік табылмады",
+  },
+  pl: {
+    appTitle:"Kalkulator prasowania", signInPrompt:"Zaloguj się aby kontynuować",
+    username:"Użytkownik", password:"Hasło", signIn:"Zaloguj",
+    loginError:"❌ Nieprawidłowy login lub hasło", signOut:"Wyloguj",
+    totalPresses:"Łączne prasy", totalDough:"Łączne ciasto (kg)", activeProducts:"Aktywne produkty",
+    prodDate:"Data produkcji:", footer:"Kalkulator prasowania · Wszelkie prawa zastrzeżone",
+    installTitle:"Dodaj do ekranu głównego", installSub:"Działa jak aplikacja offline", install:"Zainstaluj",
+    plan:"Plan", presses:"Prasy", dough:"Ciasto (kg)", direct:"Bezpośr.",
+    loadPdf:"Wczytaj PDF", pdfLoaded:"Załadowano {n} produktów z PDF", pdfError:"Nie można wczytać PDF", pdfNone:"Nie znaleziono produktów w PDF",
+  },
+};
+
+let currentLang = localStorage.getItem('lang') || 'en';
+
+function t(key) { return (LANGS[currentLang] || LANGS.en)[key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === lang);
+  });
+  applyI18n();
+  if (document.getElementById('app-screen').style.display === 'block') {
+    buildTables();
+    recalcAll();
+  }
+}
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (el.tagName === 'INPUT') el.placeholder = t(key);
+    else el.textContent = t(key);
+  });
+}
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
 const SECTIONS = [
   { icon:"🍞", title:"Dinner Rolls", products:[
     { code:"WROLL30-SAM",  name:"White Dinner Roll",     logic:"press", plan:135, ea:36, pw:1.44,  comment:"36 ea × 0.040 kg" },
@@ -258,56 +385,56 @@ const SECTIONS = [
     { code:"OLIVROLL30",   name:"Olive Dinner Roll",     logic:"press", plan:30,  ea:36, pw:1.224, comment:"36 ea × 0.034 kg" },
   ]},
   { icon:"🫓", title:"Baps", products:[
-    { code:"WMBAP40-SAM",  name:"Wholemeal Bap Small",       logic:"press", plan:35, ea:36, pw:1.80, comment:"36 ea × 0.050 kg" },
-    { code:"MWBAP90",      name:"Malted Wheat Bap Large",    logic:"press", plan:6,  ea:30, pw:3.00, comment:"30 ea × 0.100 kg" },
-    { code:"EBAP40-SAM",   name:"White Bap Floury Small",    logic:"press", plan:35, ea:36, pw:1.80, comment:"36 ea × 0.050 kg" },
-    { code:"CIABAP70-SAM", name:"Ciabatta Bap Medium",       logic:"press", plan:60, ea:30, pw:2.40, comment:"30 ea × 0.080 kg" },
+    { code:"WMBAP40-SAM",  name:"Wholemeal Bap Small",    logic:"press", plan:35, ea:36, pw:1.80, comment:"36 ea × 0.050 kg" },
+    { code:"MWBAP90",      name:"Malted Wheat Bap Large", logic:"press", plan:6,  ea:30, pw:3.00, comment:"30 ea × 0.100 kg" },
+    { code:"EBAP40-SAM",   name:"White Bap Floury Small", logic:"press", plan:35, ea:36, pw:1.80, comment:"36 ea × 0.050 kg" },
+    { code:"CIABAP70-SAM", name:"Ciabatta Bap Medium",    logic:"press", plan:60, ea:30, pw:2.40, comment:"30 ea × 0.080 kg" },
   ]},
   { icon:"🧁", title:"Muffins", products:[
-    { code:"TEM60-SAM",  name:"English Muffin Standard",       logic:"press", plan:30, ea:30, pw:2.10, comment:"30 ea × 0.070 kg" },
-    { code:"SEM80-SAM",  name:"Spelt English Muffin Large",    logic:"press", plan:15, ea:30, pw:3.00, comment:"30 ea × 0.100 kg" },
+    { code:"TEM60-SAM", name:"English Muffin Standard",    logic:"press", plan:30, ea:30, pw:2.10, comment:"30 ea × 0.070 kg" },
+    { code:"SEM80-SAM", name:"Spelt English Muffin Large", logic:"press", plan:15, ea:30, pw:3.00, comment:"30 ea × 0.100 kg" },
   ]},
   { icon:"🥖", title:"Ciabatta", products:[
-    { code:"CIABAG120",  name:"Ciabatta Baguette 120g",   logic:"press",  plan:1,  ea:16, pw:2.24,  comment:"16 ea × 0.140 kg" },
-    { code:"CIABAP110",  name:"Ciabatta 110g Long Bap",   logic:"press",  plan:25, ea:16, pw:2.08,  comment:"16 ea × 0.130 kg" },
-    { code:"CIA300",     name:"Ciabatta 300g",            logic:"direct", plan:4,  pw:0.400, comment:"Scale by unit" },
-    { code:"CIA800",     name:"Ciabatta 800g",            logic:"direct", plan:1,  pw:0.900, comment:"Scale by unit" },
-    { code:"CIAOLI300",  name:"Ciabatta Olive 300g",      logic:"direct", plan:2,  pw:0.3375,comment:"Dough only – olive 10% (0.375 × 90%)" },
-    { code:"CIAOLI800",  name:"Ciabatta Olive 800g",      logic:"direct", plan:1,  pw:0.8442,comment:"Dough only – olive 10% (0.938 × 90%)" },
+    { code:"CIABAG120",  name:"Ciabatta Baguette 120g", logic:"press",  plan:1,  ea:16, pw:2.24,   comment:"16 ea × 0.140 kg" },
+    { code:"CIABAP110",  name:"Ciabatta 110g Long Bap", logic:"press",  plan:25, ea:16, pw:2.08,   comment:"16 ea × 0.130 kg" },
+    { code:"CIA300",     name:"Ciabatta 300g",          logic:"direct", plan:4,  pw:0.400,         comment:"Scale by unit" },
+    { code:"CIA800",     name:"Ciabatta 800g",          logic:"direct", plan:1,  pw:0.900,         comment:"Scale by unit" },
+    { code:"CIAOLI300",  name:"Ciabatta Olive 300g",    logic:"direct", plan:2,  pw:0.3375,        comment:"Dough only – olive 10%" },
+    { code:"CIAOLI800",  name:"Ciabatta Olive 800g",    logic:"direct", plan:1,  pw:0.8442,        comment:"Dough only – olive 10%" },
   ]},
   { icon:"🫒", title:"Focaccia", products:[
-    { code:"FOCR1250",    name:"Focaccia Half Slab 1250g",       logic:"direct", plan:9,  pw:1.515, comment:"Scale by unit" },
-    { code:"FOCR400",     name:"Focaccia Round 400g (+5 café)",  logic:"direct", plan:9,  pw:0.450, comment:"Plan 4 + 5 café extra = 9" },
-    { code:"FOCR800",     name:"Focaccia Long 800g",             logic:"direct", plan:19, pw:1.010, comment:"Scale by unit" },
-    { code:"FOCRT600",    name:"Focaccia Long Tin 600g",         logic:"direct", plan:1,  pw:0.750, comment:"Scale by unit" },
-    { code:"FOCRT600-CF", name:"Focaccia Long Tin 600g – Café",  logic:"direct", plan:1,  pw:0.750, comment:"Scale by unit" },
+    { code:"FOCR1250",    name:"Focaccia Half Slab 1250g",      logic:"direct", plan:9,  pw:1.515, comment:"Scale by unit" },
+    { code:"FOCR400",     name:"Focaccia Round 400g (+5 café)", logic:"direct", plan:9,  pw:0.450, comment:"Plan 4 + 5 café = 9" },
+    { code:"FOCR800",     name:"Focaccia Long 800g",            logic:"direct", plan:19, pw:1.010, comment:"Scale by unit" },
+    { code:"FOCRT600",    name:"Focaccia Long Tin 600g",        logic:"direct", plan:1,  pw:0.750, comment:"Scale by unit" },
+    { code:"FOCRT600-CF", name:"Focaccia Long Tin 600g – Café", logic:"direct", plan:1,  pw:0.750, comment:"Scale by unit" },
   ]},
   { icon:"🐯", title:"Tiger Bread & Panini", products:[
-    { code:"TGRBRD",    name:"Tiger Bread Sub 120g", logic:"press",  plan:250, ea:15, pw:2.175, comment:"15 ea × 0.145 kg" },
-    { code:"PANINI120", name:"Panini Large",         logic:"press",  plan:32,  ea:36, pw:5.040, comment:"36 ea × 0.140 kg" },
+    { code:"TGRBRD",    name:"Tiger Bread Sub 120g", logic:"press", plan:250, ea:15, pw:2.175, comment:"15 ea × 0.145 kg" },
+    { code:"PANINI120", name:"Panini Large",         logic:"press", plan:32,  ea:36, pw:5.040, comment:"36 ea × 0.140 kg" },
   ]},
   { icon:"🥐", title:"Baguettes", products:[
     { code:"WMBAG300", name:"Wholemeal Baguette 300g", logic:"press", plan:60, ea:24, pw:9.600, comment:"24 ea × 0.400 kg" },
   ]},
-  { icon:"🍱", title:"Sandwich Tins 800g  (12 ea / press = 12 kg)", products:[
-    { code:"WTIN800",   name:"White Tin 800g",             logic:"press", plan:26, ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"WMTIN800",  name:"Wholemeal Tin 800g",         logic:"press", plan:21, ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"AMSTIN800", name:"Multiseed Tin 800g",         logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"MWTIN800",  name:"Malted Wheat Tin 800g",      logic:"press", plan:6,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"BMTINOP800",name:"Buttermilk Tin 800g",        logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"CF-BTRMLK", name:"Café Buttermilk Tin 800g",   logic:"press", plan:5,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"WBSTIN800", name:"Basil & Spinach Tin 800g",   logic:"press", plan:3,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
-    { code:"SHOKTIN600",name:"Shokupan Tin 600g",          logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg = 12 kg" },
+  { icon:"🍱", title:"Sandwich Tins 800g", products:[
+    { code:"WTIN800",    name:"White Tin 800g",          logic:"press", plan:26, ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"WMTIN800",   name:"Wholemeal Tin 800g",      logic:"press", plan:21, ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"AMSTIN800",  name:"Multiseed Tin 800g",      logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"MWTIN800",   name:"Malted Wheat Tin 800g",   logic:"press", plan:6,  ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"BMTINOP800", name:"Buttermilk Tin 800g",     logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"CF-BTRMLK",  name:"Café Buttermilk Tin 800g",logic:"press", plan:5,  ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"WBSTIN800",  name:"Basil & Spinach Tin 800g",logic:"press", plan:3,  ea:12, pw:12, comment:"12 ea × 1.0 kg" },
+    { code:"SHOKTIN600", name:"Shokupan Tin 600g",       logic:"press", plan:2,  ea:12, pw:12, comment:"12 ea × 1.0 kg" },
   ]},
-  { icon:"🍱", title:"Sandwich Tins 1600g  (6 ea / press = 12 kg)", products:[
-    { code:"WTIN1600",   name:"White Tin 1600g",             logic:"press", plan:11, ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"WMTIN1600",  name:"Wholemeal Tin 1600g",         logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"AMSTIN1600", name:"Multiseed Tin 1600g",         logic:"press", plan:1,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"MWTIN1600",  name:"Malted Wheat Tin 1600g",      logic:"press", plan:4,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"SPETIN1600", name:"Spelt Tin 1600g",             logic:"press", plan:1,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"WBSTIN1600", name:"Basil & Spinach Tin 1600g",   logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"WTOMTIN1600",name:"Tomato & Basil Tin 1600g",    logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
-    { code:"SHOKTIN1200",name:"Shokupan Tin 1200g",          logic:"press", plan:3,  ea:6, pw:12, comment:"6 ea × 2.0 kg = 12 kg" },
+  { icon:"🍱", title:"Sandwich Tins 1600g", products:[
+    { code:"WTIN1600",    name:"White Tin 1600g",           logic:"press", plan:11, ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"WMTIN1600",   name:"Wholemeal Tin 1600g",       logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"AMSTIN1600",  name:"Multiseed Tin 1600g",       logic:"press", plan:1,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"MWTIN1600",   name:"Malted Wheat Tin 1600g",    logic:"press", plan:4,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"SPETIN1600",  name:"Spelt Tin 1600g",           logic:"press", plan:1,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"WBSTIN1600",  name:"Basil & Spinach Tin 1600g", logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"WTOMTIN1600", name:"Tomato & Basil Tin 1600g",  logic:"press", plan:2,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
+    { code:"SHOKTIN1200", name:"Shokupan Tin 1200g",        logic:"press", plan:3,  ea:6, pw:12, comment:"6 ea × 2.0 kg" },
   ]},
   { icon:"🌾", title:"Bloomers & Cobs", products:[
     { code:"WB400",  name:"White Bloomer 400g",        logic:"direct", plan:1,  pw:0.500, comment:"Scale by unit" },
@@ -319,7 +446,6 @@ const SECTIONS = [
   ]},
 ];
 
-// Product emoji map
 const EMOJI = {
   "WROLL30-SAM":"⚪","WMROLL30-SAM":"🟤","MGROLL30-SAM":"🌱","OLIVROLL30":"🫒",
   "WMBAP40-SAM":"🟤","MWBAP90":"🌾","EBAP40-SAM":"⚪","CIABAP70-SAM":"🥖",
@@ -333,9 +459,8 @@ const EMOJI = {
   "WB400":"⬜","WB800":"⬜","WM800":"🟫","AMS400":"🌱","AMS800":"🌱","MW800":"🌾",
 };
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
 let currentUser = null;
-const planState = {}; // code → plan qty
+const planState = {};
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 function doLogin() {
@@ -345,7 +470,13 @@ function doLogin() {
     currentUser = { username: u, role: USERS[u].role };
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
-    document.getElementById('user-badge').textContent = `👤 ${USERS[u].role}`;
+    document.getElementById('user-badge').textContent = '👤 ' + USERS[u].role;
+    // restore saved lang
+    currentLang = localStorage.getItem('lang') || 'en';
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.toLowerCase() === currentLang);
+    });
+    applyI18n();
     initApp();
   } else {
     document.getElementById('login-error').style.display = 'block';
@@ -363,10 +494,8 @@ document.getElementById('password').addEventListener('keydown', e => { if(e.key=
 
 // ── APP INIT ──────────────────────────────────────────────────────────────────
 function initApp() {
-  // set today's date
   const today = new Date();
-  const dateStr = today.toISOString().split('T')[0];
-  document.getElementById('prod-date').value = dateStr;
+  document.getElementById('prod-date').value = today.toISOString().split('T')[0];
   updateDate();
   buildTables();
   recalcAll();
@@ -376,7 +505,8 @@ function updateDate() {
   const d = document.getElementById('prod-date').value;
   if (!d) return;
   const dt = new Date(d + 'T12:00:00');
-  document.getElementById('header-date').textContent = dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('header-date').textContent =
+    dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 }
 
 function buildTables() {
@@ -386,60 +516,65 @@ function buildTables() {
   SECTIONS.forEach(section => {
     const wrap = document.createElement('div');
 
-    // Section header
     const hdr = document.createElement('div');
     hdr.className = 'section-header';
     hdr.innerHTML = `<span>${section.icon}</span><span>${section.title}</span>`;
     wrap.appendChild(hdr);
 
-    // Table
     const body = document.createElement('div');
     body.className = 'section-body';
 
-    const tbl = document.createElement('table');
-    tbl.className = 'press-table';
-    tbl.innerHTML = `<thead><tr>
-      <th style="text-align:left">Product</th>
-      <th>Plan (qty)</th>
-      <th>Ea / Press</th>
-      <th>Press Wt (kg)</th>
-      <th>Presses</th>
-      <th>Dough (kg)</th>
-    </tr></thead>`;
+    // Desktop column headers
+    const thead = document.createElement('div');
+    thead.className = 'section-thead';
+    thead.innerHTML = `
+      <div class="thead-cell" style="text-align:left">Product</div>
+      <div class="thead-cell">${t('plan')}</div>
+      <div class="thead-cell">${t('presses')}</div>
+      <div class="thead-cell">${t('dough')}</div>
+    `;
+    body.appendChild(thead);
 
-    const tbody = document.createElement('tbody');
     section.products.forEach(prod => {
       planState[prod.code] = prod.plan;
-      const tr = document.createElement('tr');
       const emoji = EMOJI[prod.code] || '🍞';
-
-      const eaCell  = prod.logic === 'press' ? prod.ea   : '–';
-      const pwCell  = prod.pw.toFixed(3);
-
-      tr.innerHTML = `
-        <td class="prod-name">
+      const row = document.createElement('div');
+      row.className = 'prod-row';
+      row.innerHTML = `
+        <div class="prod-info">
           <span class="prod-emoji">${emoji}</span>
           <div class="prod-label">
-            <div>${prod.name}</div>
+            <div class="prod-name-text">${prod.name}</div>
             <div class="prod-comment">${prod.comment}</div>
           </div>
-        </td>
-        <td class="num-cell">
+        </div>
+        <div class="plan-wrap">
+          <span class="plan-label">${t('plan')}</span>
           <input class="plan-input" type="number" min="0" value="${prod.plan}"
             data-code="${prod.code}" data-logic="${prod.logic}"
             data-ea="${prod.logic==='press'?prod.ea:0}" data-pw="${prod.pw}"
             oninput="onPlanChange(this)">
-        </td>
-        <td class="num-cell">${eaCell}</td>
-        <td class="num-cell">${pwCell}</td>
-        <td class="presses-cell" id="presses-${prod.code}">–</td>
-        <td class="dough-cell"  id="dough-${prod.code}">–</td>
+        </div>
+        <div class="prod-results">
+          ${prod.logic==='press'
+            ? `<div class="pill">
+                <span class="pill-val green" id="presses-${prod.code}">–</span>
+                <span class="pill-lbl">${t('presses')}</span>
+               </div>`
+            : `<div class="pill">
+                <span class="pill-val" style="color:var(--muted);font-size:12px">${t('direct')}</span>
+                <span class="pill-lbl">${t('presses')}</span>
+               </div>`
+          }
+          <div class="pill">
+            <span class="pill-val" id="dough-${prod.code}">–</span>
+            <span class="pill-lbl">${t('dough')}</span>
+          </div>
+        </div>
       `;
-      tbody.appendChild(tr);
+      body.appendChild(row);
     });
 
-    tbl.appendChild(tbody);
-    body.appendChild(tbl);
     wrap.appendChild(body);
     container.appendChild(wrap);
   });
@@ -464,13 +599,11 @@ function onPlanChange(input) {
   const pCell = document.getElementById('presses-' + code);
   const dCell = document.getElementById('dough-' + code);
 
-  if (logic === 'press') {
+  if (pCell && logic === 'press') {
     pCell.textContent = presses;
-    pCell.className = 'presses-cell' + (presses === 0 ? ' zero' : '');
-  } else {
-    pCell.innerHTML = '<span class="dash">–</span>';
+    pCell.className = 'pill-val green' + (presses === 0 ? ' zero' : '');
   }
-  dCell.textContent = dough.toFixed(3);
+  if (dCell) dCell.textContent = dough.toFixed(3);
 
   updateSummary();
 }
@@ -478,52 +611,6 @@ function onPlanChange(input) {
 function recalcAll() {
   document.querySelectorAll('.plan-input').forEach(input => onPlanChange(input));
 }
-
-// ── PWA INSTALL PROMPT ───────────────────────────────────────────────────────
-// Register inline Service Worker for PWA (no external sw.js needed)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    const swCode = `
-const CACHE = 'bakery-press-v1';
-const ASSETS = ['/bakery-press/', '/bakery-press/index.html'];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/bakery-press/index.html'))));
-});
-`;
-    const blob = new Blob([swCode], {type: 'application/javascript'});
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).catch(err => console.log('SW:', err));
-  });
-}
-
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const banner = document.getElementById('install-banner');
-  banner.style.display = 'flex';
-});
-document.getElementById('install-btn').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  document.getElementById('install-banner').style.display = 'none';
-});
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-banner').style.display = 'none';
-  deferredPrompt = null;
-});
 
 function updateSummary() {
   let totalPresses = 0, totalDough = 0, activeLines = 0;
@@ -545,6 +632,169 @@ function updateSummary() {
   document.getElementById('total-dough').textContent   = totalDough.toFixed(1);
   document.getElementById('active-lines').textContent  = activeLines;
 }
+
+// ── PWA ───────────────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swCode = `
+const CACHE = 'bakery-press-v2';
+const ASSETS = ['/bakery-press/', '/bakery-press/index.html'];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/bakery-press/index.html'))));
+});`;
+    const blob = new Blob([swCode], {type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  });
+}
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').style.display = 'none';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+});
+
+// ── PDF IMPORT ────────────────────────────────────────────────────────────────
+// Build a flat map of all product codes → product objects for fast lookup
+function buildCodeMap() {
+  const map = {};
+  SECTIONS.forEach(section => {
+    section.products.forEach(prod => {
+      map[prod.code.toUpperCase()] = prod;
+    });
+  });
+  return map;
+}
+
+function showToast(msg, type = 'success', duration = 3500) {
+  const el = document.getElementById('pdf-toast');
+  el.textContent = msg;
+  el.className = 'pdf-toast ' + type;
+  el.style.display = 'block';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.display = 'none'; }, duration);
+}
+
+async function handlePdfUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = ''; // reset so same file can be uploaded again
+
+  const btn = document.querySelector('.pdf-btn');
+  btn.classList.add('loading');
+  btn.textContent = '⏳ …';
+
+  try {
+    // Set pdf.js worker path (using CDN same version)
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    // Extract all text from all pages preserving per-item text chunks
+    const allLines = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const content = await page.getTextContent();
+
+      // Group text items by their Y position (row) → columns left-to-right
+      const rowMap = {};
+      content.items.forEach(item => {
+        const y = Math.round(item.transform[5]); // vertical position
+        if (!rowMap[y]) rowMap[y] = [];
+        rowMap[y].push({ x: item.transform[4], text: item.str.trim() });
+      });
+
+      // Sort rows top-to-bottom (higher Y = higher on page in PDF coords)
+      const sortedYs = Object.keys(rowMap).map(Number).sort((a,b) => b - a);
+      sortedYs.forEach(y => {
+        const cells = rowMap[y].sort((a,b) => a.x - b.x).map(c => c.text).filter(Boolean);
+        if (cells.length) allLines.push(cells);
+      });
+    }
+
+    // Parse: look for rows where first column is a known product code
+    // PDF structure: Products | Units | Scaling Weight | Total
+    // "Units" column (index 1) = plan qty we want
+    const codeMap = buildCodeMap();
+    let loaded = 0;
+    const matched = new Set();
+
+    allLines.forEach(cells => {
+      if (!cells.length) return;
+      // First cell might be code, possibly with emoji prefix — strip non-alphanumeric from start
+      const rawCode = cells[0].replace(/^[^A-Za-z0-9]+/, '').toUpperCase();
+
+      // Try exact match first, then try if any known code is found within the cell
+      let prod = codeMap[rawCode];
+      if (!prod) {
+        // Some PDFs merge code with name in one cell — scan for code at start
+        for (const code of Object.keys(codeMap)) {
+          if (rawCode.startsWith(code)) { prod = codeMap[code]; break; }
+        }
+      }
+
+      if (prod && !matched.has(prod.code)) {
+        // Units column = cells[1], try to parse as integer
+        const qty = cells.length > 1 ? parseInt(cells[1].replace(/[^0-9]/g, '')) : NaN;
+        if (!isNaN(qty) && qty >= 0) {
+          // Find the input element for this product code and update it
+          const inp = document.querySelector(`.plan-input[data-code="${prod.code}"]`);
+          if (inp) {
+            inp.value = qty;
+            onPlanChange(inp);
+            matched.add(prod.code);
+            loaded++;
+          }
+        }
+      }
+    });
+
+    btn.classList.remove('loading');
+    btn.textContent = t('loadPdf');
+    // Apply i18n to button text properly
+    btn.setAttribute('data-i18n', 'loadPdf');
+
+    if (loaded === 0) {
+      showToast('⚠️ ' + t('pdfNone'), 'error');
+    } else {
+      const msg = t('pdfLoaded').replace('{n}', loaded);
+      showToast('✅ ' + msg, 'success');
+    }
+
+  } catch (err) {
+    console.error('PDF parse error:', err);
+    btn.classList.remove('loading');
+    btn.textContent = t('loadPdf');
+    btn.setAttribute('data-i18n', 'loadPdf');
+    showToast('❌ ' + t('pdfError'), 'error');
+  }
+}
+
+// init lang on page load
+applyI18n();
 </script>
 </body>
 </html>
